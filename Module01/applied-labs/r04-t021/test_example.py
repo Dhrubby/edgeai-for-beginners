@@ -1,4 +1,8 @@
+from pathlib import Path
+import sys
 import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from example import check_token_budget
 
 
@@ -29,11 +33,12 @@ class TestTokenBudgetPreflight(unittest.TestCase):
 
     def test_empty_input_retains_none(self):
         """Empty or whitespace-only input retains no tokens."""
-        result = check_token_budget("", budget=3)
-        self.assertEqual(result["retained_tokens"], [])
-        self.assertEqual(result["retained_count"], 0)
-        self.assertEqual(result["removed_count"], 0)
-        self.assertFalse(result["truncated"])
+        for raw in ("", "   \t\n  "):
+            result = check_token_budget(raw, budget=3)
+            self.assertEqual(result["retained_tokens"], [])
+            self.assertEqual(result["retained_count"], 0)
+            self.assertEqual(result["removed_count"], 0)
+            self.assertFalse(result["truncated"])
 
     def test_zero_budget_truncates_all(self):
         """Zero budget is valid and truncates all tokens."""
